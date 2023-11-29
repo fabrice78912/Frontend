@@ -21,6 +21,8 @@ import { LoginComponent } from './login/login.component';
 import { TokenInterceptorInterceptor } from './service/token-interceptor.interceptor';
 import { ConfirmationComponent } from './material-component/dialog/confirmation/confirmation.component';
 import { ChangePasswordComponent } from './material-component/dialog/change-password/change-password.component';
+import { ManageCategoryComponent } from './material-component/manage-category/manage-category.component';
+import { CategoryComponent } from './material-component/dialog/category/category.component';
 
 const ngxUiloaderConfig: NgxUiLoaderConfig = {
   text: "Loading...",
@@ -46,7 +48,9 @@ const ngxUiloaderConfig: NgxUiLoaderConfig = {
     ForgotPasswordComponent,
     LoginComponent,
     ConfirmationComponent,
-    ChangePasswordComponent
+    ChangePasswordComponent,
+    ManageCategoryComponent,
+    CategoryComponent
    ],
   imports: [
     BrowserModule,
