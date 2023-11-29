@@ -14,11 +14,13 @@ import { FullComponent } from './layouts/full/full.component';
 import { AppHeaderComponent } from './layouts/full/header/header.component';
 import { AppSidebarComponent } from './layouts/full/sidebar/sidebar.component';
 import { SignupComponent } from './signup/signup.component';
-import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgxUiLoaderConfig, NgxUiLoaderModule, SPINNER } from 'ngx-ui-loader';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { LoginComponent } from './login/login.component';
 import { TokenInterceptorInterceptor } from './service/token-interceptor.interceptor';
+import { ConfirmationComponent } from './material-component/dialog/confirmation/confirmation.component';
+import { ChangePasswordComponent } from './material-component/dialog/change-password/change-password.component';
 
 const ngxUiloaderConfig: NgxUiLoaderConfig = {
   text: "Loading...",
@@ -42,7 +44,9 @@ const ngxUiloaderConfig: NgxUiLoaderConfig = {
     AppSidebarComponent,
     SignupComponent,
     ForgotPasswordComponent,
-    LoginComponent
+    LoginComponent,
+    ConfirmationComponent,
+    ChangePasswordComponent
    ],
   imports: [
     BrowserModule,
@@ -56,7 +60,7 @@ const ngxUiloaderConfig: NgxUiLoaderConfig = {
     HttpClientModule,
     NgxUiLoaderModule.forRoot(ngxUiloaderConfig)
   ],
-  providers: [HttpClient, {provide:HTTP_INTERCEPTORS, useClass:TokenInterceptorInterceptor, multi:true}],
+  providers: [HttpClientModule, {provide:HTTP_INTERCEPTORS, useClass:TokenInterceptorInterceptor, multi:true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

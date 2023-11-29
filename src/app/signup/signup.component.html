@@ -46,7 +46,7 @@
                     [attr.aria-label]="'Hide password'" [attr.aria-pressed]="password">
                     <mat-icon>{{password ? 'visibility_off' : 'visibility' }}</mat-icon>
                 </button>
-                <mat-error *ngIf="signUpForm.controls.password.touched && signUpForm.controls.name.invalid">
+                <mat-error *ngIf="signUpForm.controls.password.touched && signUpForm.controls.password.invalid">
                     <span *ngIf="signUpForm.controls.password.errors.required">This field is mandatory.</span>
                 </mat-error>
             </mat-form-field>
@@ -59,13 +59,15 @@
                     [attr.aria-label]="'Hide password'" [attr.aria-pressed]="password">
                     <mat-icon>{{confirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                 </button>
-                <mat-error *ngIf="signUpForm.controls.confirmPassword.touched && signUpForm.controls.name.invalid">
+                <mat-error *ngIf="signUpForm.controls.confirmPassword.touched && signUpForm.controls.confirmPassword.invalid">
                     <span *ngIf="signUpForm.controls.confirmPassword.errors.required">This field is mandatory.</span>
                 </mat-error>
                 <mat-hint *ngIf="validateSubmit() && ! (signUpForm.controls.confirmPassword.invalid)">
-                    <span>New password and confirm password doesn't match</span>
+                    <span>New password and confirm password doesn't match.</span>
                 </mat-hint>
             </mat-form-field>
+
+
         </div>
     </form>
 </mat-dialog-content>

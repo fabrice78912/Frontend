@@ -9,13 +9,14 @@ export class AuthService {
 
   constructor(private router: Router) { }
 
-  public isAuthenticated(): boolean {
-    const token = localStorage.getItem('token');
-    if (!token) {
+  public isAuthenticated(): boolean 
+  {
+    const token= localStorage.getItem('token');
+    if(!token){
       this.router.navigate(['/'])
-      return false;
-    } else {
-      return true;
+    return false;
+    }else{
+     return true;
     }
   }
 }
