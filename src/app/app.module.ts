@@ -23,6 +23,8 @@ import { ConfirmationComponent } from './material-component/dialog/confirmation/
 import { ChangePasswordComponent } from './material-component/dialog/change-password/change-password.component';
 import { ManageCategoryComponent } from './material-component/manage-category/manage-category.component';
 import { CategoryComponent } from './material-component/dialog/category/category.component';
+import { ManageProductComponent } from './material-component/manage-product/manage-product.component';
+import { ProductComponent } from './material-component/dialog/product/product.component';
 
 const ngxUiloaderConfig: NgxUiLoaderConfig = {
   text: "Loading...",
@@ -50,7 +52,9 @@ const ngxUiloaderConfig: NgxUiLoaderConfig = {
     ConfirmationComponent,
     ChangePasswordComponent,
     ManageCategoryComponent,
-    CategoryComponent
+    CategoryComponent,
+    ManageProductComponent,
+    ProductComponent
    ],
   imports: [
     BrowserModule,
