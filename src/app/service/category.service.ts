@@ -27,4 +27,8 @@ getCategorys(){
   return this.httpClient.get(this.url +"/category/get" );
 }
 
+getFilteredCategorys(){
+  return this.httpClient.get(this.url+"/category/get?filter=true");
+}
+
 }
