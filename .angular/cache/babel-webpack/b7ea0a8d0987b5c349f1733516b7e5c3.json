@@ -1,0 +1,1 @@
+{"ast":null,"code":"export const environment = {\n  production: false,\n  //apiUrl: 'http://18.218.99.45:8080'\n  apiUrl: 'http://localhost:8081ß'\n};","map":null,"metadata":{},"sourceType":"module"}
