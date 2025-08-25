@@ -81,7 +81,7 @@ jobs:
           REF="${GITHUB_REF}"
           if [[ "$REF" == "refs/heads/dev" ]]; then
             ENV="dev"
-            TAG="dev-${SHA}-${DATE}"
+            TAG="dev-front-${SHA}-${DATE}"
           elif [[ "$REF" == refs/heads/rc-* ]]; then
             ENV="staging"
             TAG="staging-front-${SHA}-${DATE}"
@@ -90,7 +90,7 @@ jobs:
             TAG="prod-front-${SHA}-${DATE}"
           elif [[ "$REF" == refs/heads/feature/* ]]; then
             ENV="dev"
-            TAG="dev-${SHA}-${DATE}"
+            TAG="dev-front-${SHA}-${DATE}"
           else
             ENV="unknown"
             TAG="unknown-front-${SHA}-${DATE}"
@@ -101,8 +101,13 @@ jobs:
       - name: Build Docker image
         run: docker build -t $ECR_REGISTRY/${{ env.REPO_NAME }}:${{ env.TAG }} .
 
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v1
+    #   - name: Login to Amazon ECR
+    #     uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Login to Amazon ECR (secure)
+        run: |
+          aws ecr get-login-password --region $AWS_REGION \
+          | docker login --username AWS --password-stdin $ECR_REGISTRY
 
       - name: Push Docker image to ECR
         run: docker push $ECR_REGISTRY/${{ env.REPO_NAME }}:${{ env.TAG }}
