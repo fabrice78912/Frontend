@@ -84,16 +84,16 @@ jobs:
             TAG="dev-${SHA}-${DATE}"
           elif [[ "$REF" == refs/heads/rc-* ]]; then
             ENV="staging"
-            TAG="staging-${SHA}-${DATE}"
+            TAG="staging-front-${SHA}-${DATE}"
           elif [[ "$REF" == "refs/heads/main" ]]; then
             ENV="prod"
-            TAG="prod-${SHA}-${DATE}"
+            TAG="prod-front-${SHA}-${DATE}"
           elif [[ "$REF" == refs/heads/feature/* ]]; then
             ENV="dev"
             TAG="dev-${SHA}-${DATE}"
           else
             ENV="unknown"
-            TAG="unknown-${SHA}-${DATE}"
+            TAG="unknown-front-${SHA}-${DATE}"
           fi
           echo "ENV=$ENV" >> $GITHUB_ENV
           echo "TAG=$TAG" >> $GITHUB_ENV
