@@ -1,0 +1,122 @@
+name: 'CI - Angular Frontend'
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - rc-*
+      - feature/*
+  pull_request:
+    branches:
+      - main
+      - dev
+      - rc-*
+  workflow_dispatch: null
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: '${{ secrets.AWS_REGION }}'
+  AWS_ACCOUNT_ID: '${{ secrets.AWS_ACCOUNT_ID }}'
+  ECR_REPO: '${{ secrets.ECR_REPO }}'
+  REPO_NAME: '${{ secrets.REPO_NAME }}'
+  REPO_DEPLOY: '${{ secrets.REPO_DEPLOY }}'
+  PERSONAL_ACCESS_TOKEN: '${{ secrets.PERSONAL_ACCESS_TOKEN }}'
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+jobs:
+  detect-branch:
+    runs-on: ubuntu-latest
+    outputs:
+      is-first-push: ${{ steps.check.outputs.is_first_push }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: check
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
+            echo "is_first_push=false" >> $GITHUB_OUTPUT
+          else
+            echo "is_first_push=true" >> $GITHUB_OUTPUT
+          fi
+
+  build-and-test:
+    needs: detect-branch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+      - name: Build Angular
+        run: npm run build
+      # Optionnel : lint/test
+      # - name: Run tests
+      #   run: npm test
+
+  build-push:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: ${{ needs.detect-branch.outputs.is-first-push == 'false' || github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/GitHubActionsECRRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set environment tag with date
+        run: |
+          SHA=$(echo "${GITHUB_SHA}" | cut -c1-8)
+          DATE=$(date +%Y%m%d-%H%M%S)
+          REF="${GITHUB_REF}"
+          if [[ "$REF" == "refs/heads/dev" ]]; then
+            ENV="dev"
+            TAG="dev-${SHA}-${DATE}"
+          elif [[ "$REF" == refs/heads/rc-* ]]; then
+            ENV="staging"
+            TAG="staging-${SHA}-${DATE}"
+          elif [[ "$REF" == "refs/heads/main" ]]; then
+            ENV="prod"
+            TAG="prod-${SHA}-${DATE}"
+          elif [[ "$REF" == refs/heads/feature/* ]]; then
+            ENV="dev"
+            TAG="dev-${SHA}-${DATE}"
+          else
+            ENV="unknown"
+            TAG="unknown-${SHA}-${DATE}"
+          fi
+          echo "ENV=$ENV" >> $GITHUB_ENV
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        run: docker build -t $ECR_REGISTRY/${{ env.REPO_NAME }}:${{ env.TAG }} .
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Push Docker image to ECR
+        run: docker push $ECR_REGISTRY/${{ env.REPO_NAME }}:${{ env.TAG }}
+
+    #   - name: Trigger CD
+    #     uses: peter-evans/repository-dispatch@v2
+    #     with:
+    #       token: ${{ env.PERSONAL_ACCESS_TOKEN }}
+    #       repository: ${{ env.REPO_DEPLOY }}
+    #       event-type: deploy
+    #       client-payload: |
+    #         {
+    #           "branch": "${{ github.ref_name }}",
+    #           "image_tag": "${{ env.TAG }}",
+    #           "environment": "${{ env.ENV }}",
+    #           "microservice": "frontend"
+    #         }
